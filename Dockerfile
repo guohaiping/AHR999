@@ -4,17 +4,23 @@ FROM python:3.9-slim
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# 安装Chrome、cron和必要的依赖
+# 安装浏览器和必要的依赖
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     unzip \
     cron \
     tzdata \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable \
+    && if [ "$(uname -m)" = "x86_64" ]; then \
+        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+        && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
+        && apt-get update \
+        && apt-get install -y google-chrome-stable \
+        && CHROME_BIN=/usr/bin/google-chrome; \
+    else \
+        apt-get install -y chromium chromium-driver \
+        && CHROME_BIN=/usr/bin/chromium; \
+    fi \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置工作目录
@@ -38,6 +44,7 @@ RUN touch /var/log/cron.log
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1
+ENV CHROME_BIN=${CHROME_BIN}
 
 # 创建启动脚本
 RUN echo '#!/bin/sh\nservice cron start\ntail -f /var/log/cron.log' > /app/start.sh

@@ -3,7 +3,7 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -31,16 +31,19 @@ def send_server_chan(title, content):
 def get_latest_ahr999():
     url = 'https://www.coinglass.com/zh/pro/i/ahr999'
 
-    # 启动无头 Chrome
-    options = webdriver.ChromeOptions()
+    # 启动无头浏览器
+    options = Options()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(
-        service=ChromeService(ChromeDriverManager().install()),
-        options=options
-    )
+    
+    # 根据环境变量设置浏览器路径
+    chrome_bin = os.getenv('CHROME_BIN')
+    if chrome_bin:
+        options.binary_location = chrome_bin
+    
+    driver = webdriver.Chrome(options=options)
 
     try:
         driver.get(url)
