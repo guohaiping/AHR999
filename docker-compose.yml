@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  ahr999:
+    build: .
+    environment:
+      - SERVER_CHAN_SCKEY=${SERVER_CHAN_SCKEY}
+    restart: unless-stopped 
