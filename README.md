@@ -22,8 +22,8 @@
 
 1. 克隆仓库：
 ```bash
-git clone <你的仓库地址>
-cd <项目目录>
+git clone https://github.com/guohaiping/AHR999.git
+cd AHR999
 ```
 
 2. 创建环境变量文件：
@@ -33,7 +33,7 @@ echo "SERVER_CHAN_SCKEY=你的Server酱SCKEY" > .env
 
 3. 构建并运行Docker容器：
 ```bash
-docker-compose up -d
+sudo docker-compose up -d --build
 ```
 
 ## 环境变量
@@ -53,7 +53,7 @@ docker-compose up -d
 
 查看运行日志：
 ```bash
-docker-compose logs -f
+sudo docker-compose logs -f
 ```
 
 ## 故障排除
@@ -74,7 +74,7 @@ docker-compose logs -f
 
 如果需要手动运行脚本，可以执行：
 ```bash
-docker-compose exec ahr999 python arh999.py
+sudo docker-compose exec ahr999 python arh999.py
 ```
 
 ## 许可证
