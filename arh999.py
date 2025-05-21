@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options
@@ -43,7 +42,8 @@ def get_latest_ahr999():
     if chrome_bin:
         options.binary_location = chrome_bin
     
-    driver = webdriver.Chrome(options=options)
+    service = ChromeService(executable_path='/usr/bin/chromedriver')
+    driver = webdriver.Chrome(service=service, options=options)
 
     try:
         driver.get(url)
