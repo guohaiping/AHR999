@@ -35,8 +35,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 复制脚本
 COPY arh999.py .
 
-# 创建cron任务（每周日早上9点执行）
-RUN echo "0 9 * * 0 cd /app && python arh999.py >> /var/log/cron.log 2>&1" > /etc/cron.d/ahr999-cron
+# 创建cron任务（每周日上午11点执行）
+RUN echo "0 11 * * 0 root export SERVER_CHAN_SCKEY=\$SERVER_CHAN_SCKEY && cd /app && /usr/local/bin/python3 arh999.py >> /var/log/cron.log 2>&1" > /etc/cron.d/ahr999-cron
+RUN echo "" >> /etc/cron.d/ahr999-cron
 RUN chmod 0644 /etc/cron.d/ahr999-cron
 
 # 创建日志文件
