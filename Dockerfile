@@ -35,8 +35,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 复制脚本
 COPY arh999.py .
 
-# 创建cron任务（每周日上午11点执行）
-RUN echo "0 11 * * 0 root export SERVER_CHAN_SCKEY=\$SERVER_CHAN_SCKEY && cd /app && /usr/local/bin/python3 arh999.py >> /var/log/cron.log 2>&1" > /etc/cron.d/ahr999-cron
+# 创建cron任务（每周日上午9点执行）
+RUN echo "0 9 * * 0 root export SERVER_CHAN_SCKEY=\$SERVER_CHAN_SCKEY && cd /app && /usr/local/bin/python3 arh999.py >> /var/log/cron.log 2>&1" > /etc/cron.d/ahr999-cron
 RUN echo "" >> /etc/cron.d/ahr999-cron
 RUN chmod 0644 /etc/cron.d/ahr999-cron
 
@@ -48,7 +48,11 @@ ENV PYTHONUNBUFFERED=1
 ENV CHROME_BIN=${CHROME_BIN}
 
 # 创建启动脚本
-RUN echo '#!/bin/sh\nservice cron start\ntail -f /var/log/cron.log' > /app/start.sh
+RUN echo '#!/bin/sh
+touch /var/log/cron.log
+cron
+echo "Cron daemon started. Tailing /var/log/cron.log..."
+tail -f /var/log/cron.log' > /app/start.sh
 RUN chmod +x /app/start.sh
 
 # 运行启动脚本

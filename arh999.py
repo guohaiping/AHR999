@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,11 +10,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
 import os
+import logging
 
 def send_server_chan(title, content):
     sckey = os.getenv('SERVER_CHAN_SCKEY')
     if not sckey:
-        print("未设置SERVER_CHAN_SCKEY环境变量")
+        logging.warning("未设置SERVER_CHAN_SCKEY环境变量")
         return
     
     url = f"https://sctapi.ftqq.com/{sckey}.send"
@@ -23,12 +25,13 @@ def send_server_chan(title, content):
     }
     response = requests.post(url, data=data)
     if response.status_code == 200:
-        print("Server酱通知发送成功")
+        logging.info("Server酱通知发送成功")
     else:
-        print(f"Server酱通知发送失败: {response.text}")
+        logging.error(f"Server酱通知发送失败: {response.text}")
 
 def get_latest_ahr999():
     url = 'https://www.coinglass.com/zh/pro/i/ahr999'
+    driver = None  # Initialize driver to None
 
     # 启动无头浏览器
     options = Options()
@@ -42,10 +45,11 @@ def get_latest_ahr999():
     if chrome_bin:
         options.binary_location = chrome_bin
     
-    service = ChromeService(executable_path='/usr/bin/chromedriver')
-    driver = webdriver.Chrome(service=service, options=options)
-
+    # service = ChromeService(executable_path='/usr/bin/chromedriver')
+    service = ChromeService(ChromeDriverManager().install())
+    
     try:
+        driver = webdriver.Chrome(service=service, options=options)
         driver.get(url)
 
         # 最多等 15 秒，直到找到第一行 tr[data-row-key]
@@ -63,17 +67,21 @@ def get_latest_ahr999():
         date = row.find_all('td')[0].div.text.strip()
         value = row.find_all('td')[1].div.text.strip()
         return date, value
-
+    except Exception as e:
+        logging.error(f"Error during WebDriver operation in get_latest_ahr999: {e}") 
+        raise # Re-raise to be handled by the main script's error handler
     finally:
-        driver.quit()
+        if driver:
+            driver.quit()
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     try:
         date, value = get_latest_ahr999()
         message = f"{date} 的 AHR999 指数值：{value}"
-        print(message)
+        logging.info(message)
         send_server_chan("AHR999指数更新", message)
     except Exception as e:
         error_message = f"获取AHR999指数失败: {str(e)}"
-        print(error_message)
+        logging.error(error_message)
         send_server_chan("AHR999指数获取失败", error_message)
