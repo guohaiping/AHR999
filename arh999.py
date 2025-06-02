@@ -11,8 +11,33 @@ import requests
 import os
 import traceback
 import time
+import re
+
+def load_env_from_file():
+    """从container_env文件加载环境变量"""
+    try:
+        if os.path.exists('/app/container_env'):
+            print("从container_env文件加载环境变量")
+            with open('/app/container_env', 'r') as f:
+                for line in f:
+                    # 忽略注释和空行
+                    if not line.strip() or line.strip().startswith('#'):
+                        continue
+                    # 解析KEY=VALUE格式
+                    match = re.match(r'([^=]+)=(.*)', line.strip())
+                    if match:
+                        key, value = match.groups()
+                        # 只设置未定义的环境变量
+                        if key not in os.environ:
+                            os.environ[key] = value
+                            print(f"从文件设置环境变量: {key}")
+    except Exception as e:
+        print(f"加载环境变量文件出错: {e}")
 
 def send_server_chan(title, content):
+    # 尝试从文件加载环境变量
+    load_env_from_file()
+    
     sckey = os.getenv('SERVER_CHAN_SCKEY')
     if not sckey:
         print("未设置SERVER_CHAN_SCKEY环境变量")
@@ -23,6 +48,9 @@ def send_server_chan(title, content):
         "title": title,
         "desp": content
     }
+    
+    print(f"准备向Server酱发送通知，SCKEY长度: {len(sckey)}")
+    
     response = requests.post(url, data=data)
     if response.status_code == 200:
         print("Server酱通知发送成功")
