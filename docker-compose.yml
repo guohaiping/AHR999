@@ -2,5 +2,5 @@ services:
   ahr999:
     build: .
     environment:
-      - SERVER_CHAN_SCKEY=${SERVER_CHAN_SCKEY}
+      - SERVER_CHAN_SCKEY=SCT88027TAZC7AiizmoMRatG6we0pzQgL
     restart: unless-stopped 
