@@ -12,6 +12,7 @@ import os
 import traceback
 import time
 import re
+import shutil
 
 def load_env_from_file():
     """从container_env文件加载环境变量"""
@@ -72,11 +73,53 @@ def get_latest_ahr999():
     options.add_argument('--window-size=1920,1080')
     options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
     
-    # 设置浏览器路径为chromium
-    options.binary_location = '/usr/bin/chromium'
+    # 检测并设置浏览器二进制文件路径
+    chrome_paths = [
+        '/usr/bin/chromium-browser',
+        '/usr/bin/chromium',
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable'
+    ]
+    
+    chrome_binary = None
+    for path in chrome_paths:
+        if os.path.exists(path):
+            chrome_binary = path
+            print(f"找到浏览器路径: {chrome_binary}")
+            break
+            
+    if not chrome_binary:
+        raise RuntimeError("未找到Chrome或Chromium浏览器，请确保已安装")
+    
+    options.binary_location = chrome_binary
+    
+    # 检测并设置ChromeDriver路径
+    chromedriver_paths = [
+        '/usr/bin/chromedriver',
+        '/usr/local/bin/chromedriver'
+    ]
+    
+    chromedriver_path = None
+    for path in chromedriver_paths:
+        if os.path.exists(path):
+            chromedriver_path = path
+            print(f"找到ChromeDriver路径: {chromedriver_path}")
+            break
+            
+    if not chromedriver_path:
+        # 尝试通过which命令查找
+        try:
+            chromedriver_path = shutil.which('chromedriver')
+            if chromedriver_path:
+                print(f"通过which命令找到ChromeDriver: {chromedriver_path}")
+        except Exception:
+            pass
+            
+    if not chromedriver_path:
+        raise RuntimeError("未找到ChromeDriver，请确保已安装")
     
     print("正在启动浏览器...")
-    service = ChromeService(executable_path='/usr/bin/chromedriver')
+    service = ChromeService(executable_path=chromedriver_path)
     
     try:
         driver = webdriver.Chrome(service=service, options=options)
@@ -140,7 +183,7 @@ if __name__ == '__main__':
         date, value = get_latest_ahr999()
         message = f"{date} 的 AHR999 指数值：{value}"
         print(message)
-        send_server_chan("AHR999指数更新", message)
+        send_server_chan("AHR999指数更新"+value, message)
     except Exception as e:
         error_message = f"获取AHR999指数失败: {str(e)}"
         print(error_message)
