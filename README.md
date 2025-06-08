@@ -63,19 +63,39 @@ sudo docker-compose logs -f
    - Docker容器有足够的资源限制
 
 2. 如果Server酱通知失败：
-   - 检查SERVER_CHAN_SCKEY是否正确设置
-   - 确认网络连接正常
+   - 检查`docker-compose.yml`或`.env`文件中的`SERVER_CHAN_SCKEY`是否正确设置。
+   - 确认网络连接正常。
+   - **执行部署后验证**，确保密钥已加载到容器中。
 
 3. 如果定时任务不运行：
    - 检查容器是否正常运行
    - 查看容器日志是否有错误信息
 
-## 手动运行
+## 部署后验证
 
-如果需要手动运行脚本，可以执行：
+修改`docker-compose.yml`或`.env`文件后，需要强制重新创建容器才能让环境变量生效。
+
 ```bash
-sudo docker-compose exec ahr999 python arh999.py
+sudo docker-compose up -d --force-recreate
 ```
+
+容器重启后，可以通过以下命令检查`SERVER_CHAN_SCKEY`是否被成功加载到容器的环境变量缓存文件中。可以通过`sudo docker ps`查看实际的容器名称。
+
+```bash
+# 注意将 ahr999-ahr999-1 替换为你的实际容器名
+sudo docker exec ahr999-ahr999-1 cat /app/container_env
+```
+如果输出的内容中包含`SERVER_CHAN_SCKEY=你的密钥`，则说明配置成功。
+
+## 手动触发测试
+
+如果想立即测试一次数据获取和推送功能，而不是等待定时任务，可以执行以下命令手动触发脚本：
+
+```bash
+# 注意将 ahr999-ahr999-1 替换为你的实际容器名
+sudo docker exec ahr999-ahr999-1 /usr/local/bin/python3 /app/arh999.py
+```
+**注意**：此命令直接在容器内执行脚本，会使用容器内的环境变量，可以完整地模拟定时任务的实际运行情况。
 
 ## 许可证
 
