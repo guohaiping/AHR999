@@ -10,6 +10,7 @@
 - 通过Server酱发送通知
 - 错误处理和通知
 - 内置定时任务管理
+- 同时支持ARM和x86架构
 
 ## 系统要求
 
@@ -46,6 +47,15 @@ sudo docker-compose up -d --build
 - `Dockerfile`: Docker镜像构建文件
 - `docker-compose.yml`: Docker Compose配置文件
 - `requirements.txt`: Python依赖文件
+
+## 跨平台支持
+
+该应用程序自动适配运行环境，支持：
+
+- **ARM架构**：如树莓派、Oracle ARM实例等，使用Chromium浏览器
+- **x86_64架构**：传统服务器，使用Google Chrome
+
+程序会自动检测系统架构并安装合适的浏览器和驱动程序，无需额外配置。
 
 ## 运行说明
 
