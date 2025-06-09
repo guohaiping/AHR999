@@ -39,7 +39,7 @@ COPY arh999.py .
 RUN echo "0 9 * * 0 root export SERVER_CHAN_SCKEY=\$SERVER_CHAN_SCKEY && cd /app && /usr/local/bin/python3 arh999.py >> /var/log/cron.log 2>&1" > /etc/cron.d/ahr999-cron
 RUN echo "" >> /etc/cron.d/ahr999-cron
 RUN chmod 0644 /etc/cron.d/ahr999-cron
-
+RUN touch /var/log/cron.log
 # 创建日志文件
 RUN touch /var/log/cron.log
 
