@@ -82,7 +82,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
 
 # 创建启动脚本
 RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'source /etc/environment' >> /app/start.sh && \
+    echo '. /etc/environment' >> /app/start.sh && \
     echo 'touch /var/log/cron.log' >> /app/start.sh && \
     echo 'cron' >> /app/start.sh && \
     echo 'echo "Cron daemon started. Architecture: $(uname -m)"' >> /app/start.sh && \
