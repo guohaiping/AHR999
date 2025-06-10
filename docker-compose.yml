@@ -1,6 +1,21 @@
 services:
   ahr999:
-    build: .
+    build:
+      context: .
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: ahr999:latest
+    container_name: ahr999-new
+    network_mode: host
     environment:
       - SERVER_CHAN_SCKEY=${SERVER_CHAN_SCKEY}
-    restart: unless-stopped 
+    # restart: unless-stopped  # 已禁用自动重启
+
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "python3"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
