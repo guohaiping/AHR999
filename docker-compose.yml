@@ -10,7 +10,7 @@ services:
     network_mode: host
     environment:
       - SERVER_CHAN_SCKEY=${SERVER_CHAN_SCKEY}
-    # restart: unless-stopped  # 已禁用自动重启
+    restart: unless-stopped  # 已禁用自动重启
 
     # 健康检查
     healthcheck:
