@@ -1,6 +1,6 @@
 services:
   ahr999:
     build: .
-    environment:
-      - SERVER_CHAN_SCKEY=REMOVED
+    env_file:
+      - .env
     restart: unless-stopped 
