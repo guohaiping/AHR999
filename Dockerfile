@@ -43,11 +43,11 @@ COPY arh999.py .
 RUN echo '#!/bin/sh\nenv > /app/container_env' > /app/save_env.sh
 RUN chmod +x /app/save_env.sh
 
-# 创建cron任务（每周日上午11点执行）
+# 创建cron任务（每天上午11点执行）
 RUN echo "# 保存当前环境变量" > /etc/cron.d/ahr999-cron
 RUN echo "* * * * * root /app/save_env.sh" >> /etc/cron.d/ahr999-cron
-RUN echo "# 每周日上午11点执行AHR999脚本" >> /etc/cron.d/ahr999-cron
-RUN echo "0 11 * * 0 root cd /app && . /app/container_env && /usr/local/bin/python3 arh999.py >> /var/log/cron.log 2>&1" >> /etc/cron.d/ahr999-cron
+RUN echo "# 每天上午11点执行AHR999脚本" >> /etc/cron.d/ahr999-cron
+RUN echo "0 11 * * * root cd /app && . /app/container_env && /usr/local/bin/python3 arh999.py >> /var/log/cron.log 2>&1" >> /etc/cron.d/ahr999-cron
 RUN echo "" >> /etc/cron.d/ahr999-cron
 RUN chmod 0644 /etc/cron.d/ahr999-cron
 
