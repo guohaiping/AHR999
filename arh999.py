@@ -38,25 +38,36 @@ def load_env_from_file():
 def send_server_chan(title, content):
     # 尝试从文件加载环境变量
     load_env_from_file()
-    
+
     sckey = os.getenv('SERVER_CHAN_SCKEY')
     if not sckey:
         print("未设置SERVER_CHAN_SCKEY环境变量")
         return
-    
+
     url = f"https://sctapi.ftqq.com/{sckey}.send"
     data = {
         "title": title,
         "desp": content
     }
-    
+
     print(f"准备向Server酱发送通知，SCKEY长度: {len(sckey)}")
-    
-    response = requests.post(url, data=data)
-    if response.status_code == 200:
-        print("Server酱通知发送成功")
-    else:
-        print(f"Server酱通知发送失败: {response.text}")
+
+    # 添加重试逻辑
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(url, data=data, timeout=10)
+            if response.status_code == 200:
+                print("Server酱通知发送成功")
+                return
+            else:
+                print(f"Server酱通知发送失败 (尝试 {attempt + 1}/{max_retries}): HTTP {response.status_code} - {response.text}")
+        except Exception as e:
+            print(f"发送通知时出错 (尝试 {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2)  # 等待2秒后重试
+
+    print("Server酱通知发送失败，已达到最大重试次数")
 
 def get_latest_ahr999():
     url = 'https://www.coinglass.com/zh/pro/i/ahr999'
