@@ -44,10 +44,8 @@ RUN echo '#!/bin/sh\nenv > /app/container_env' > /app/save_env.sh
 RUN chmod +x /app/save_env.sh
 
 # 创建cron任务（每天上午11点执行）
-RUN echo "# 保存当前环境变量" > /etc/cron.d/ahr999-cron
-RUN echo "* * * * * root /app/save_env.sh" >> /etc/cron.d/ahr999-cron
-RUN echo "# 每天上午11点执行AHR999脚本" >> /etc/cron.d/ahr999-cron
-RUN echo "0 11 * * * root cd /app && . /app/container_env && /usr/local/bin/python3 arh999.py >> /var/log/cron.log 2>&1" >> /etc/cron.d/ahr999-cron
+RUN echo "# 每天上午11点执行AHR999脚本" > /etc/cron.d/ahr999-cron
+RUN echo "0 11 * * * root cd /app && /usr/local/bin/python3 arh999.py >> /var/log/cron.log 2>&1" >> /etc/cron.d/ahr999-cron
 RUN echo "" >> /etc/cron.d/ahr999-cron
 RUN chmod 0644 /etc/cron.d/ahr999-cron
 
@@ -64,7 +62,7 @@ RUN if [ -f /usr/bin/google-chrome ]; then chmod +x /usr/bin/google-chrome; fi
 RUN if [ -f /usr/bin/chromedriver ]; then chmod +x /usr/bin/chromedriver; fi
 
 # 创建启动脚本
-RUN echo '#!/bin/sh\n# 保存环境变量\nenv > /app/container_env\nservice cron start\ntail -f /var/log/cron.log' > /app/start.sh
+RUN echo '#!/bin/sh\n# 保存环境变量\nenv > /app/container_env\n# 启动cron服务\nservice cron start\n# 立即执行一次脚本进行测试\necho "容器启动，立即执行一次AHR999脚本进行测试..."\ncd /app && /usr/local/bin/python3 arh999.py\n# 保持容器运行\ntail -f /var/log/cron.log' > /app/start.sh
 RUN chmod +x /app/start.sh
 
 # 运行启动脚本

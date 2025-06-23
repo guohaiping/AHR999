@@ -36,12 +36,20 @@ def load_env_from_file():
         print(f"加载环境变量文件出错: {e}")
 
 def send_server_chan(title, content):
-    # 尝试从文件加载环境变量
-    load_env_from_file()
-
+    # 首先尝试直接从环境变量获取
     sckey = os.getenv('SERVER_CHAN_SCKEY')
+
+    # 如果没有找到，尝试从文件加载环境变量
+    if not sckey:
+        load_env_from_file()
+        sckey = os.getenv('SERVER_CHAN_SCKEY')
+
     if not sckey:
         print("未设置SERVER_CHAN_SCKEY环境变量")
+        print("当前环境变量:")
+        for key, value in os.environ.items():
+            if 'SERVER' in key or 'SCKEY' in key:
+                print(f"  {key}={value}")
         return
 
     url = f"https://sctapi.ftqq.com/{sckey}.send"
